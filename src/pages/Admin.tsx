@@ -1,13 +1,19 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BarChart, Users, Database, Bell, Upload, Settings } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { translations } from "@/lib/translations";
+
 
 const Admin = () => {
+  const { language } = useLanguage();
+  const t = translations[language].admin;
+
   const stats = [
-    { label: "Total Users", value: "2,847", icon: Users, change: "+12%" },
-    { label: "Active Listings", value: "156", icon: Database, change: "+8%" },
-    { label: "Alerts Sent", value: "423", icon: Bell, change: "+24%" },
-    { label: "Data Updates", value: "89", icon: Database, change: "+5%" },
+    { label: t.totalUsers, value: "2,847", icon: Users, change: "+12%" },
+    { label: t.activeCrops, value: "247", icon: Database, change: "+5%" },
+    { label: t.totalListings, value: "156", icon: Database, change: "+8%" },
+    { label: t.apiCalls, value: "1,243", icon: Database, change: "+15%" },
   ];
 
   return (
@@ -15,9 +21,9 @@ const Admin = () => {
       <div className="container mx-auto px-4 py-8 space-y-8">
         {/* Header */}
         <div className="space-y-4">
-          <h1 className="text-4xl font-bold text-foreground">Admin Panel</h1>
+          <h1 className="text-4xl font-bold text-foreground">{t.title}</h1>
           <p className="text-lg text-muted-foreground">
-            Manage system data, users, and configurations
+            {t.subtitle}
           </p>
         </div>
 
@@ -30,7 +36,9 @@ const Admin = () => {
                   <div>
                     <p className="text-sm text-muted-foreground">{stat.label}</p>
                     <p className="text-3xl font-bold text-foreground mt-1">{stat.value}</p>
-                    <p className="text-sm text-primary mt-1">{stat.change} from last month</p>
+                    <p className="text-sm text-primary mt-1">
+                      {stat.change} {language === 'en' ? 'from last month' : language === 'hi' ? 'पिछले महीने से' : 'मागील महिन्यापासून'}
+                    </p>
                   </div>
                   <div className="p-3 rounded-lg bg-gradient-primary">
                     <stat.icon className="h-6 w-6 text-primary-foreground" />
@@ -47,14 +55,20 @@ const Admin = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Upload className="h-5 w-5 text-primary" />
-                Upload Soil Data
+                {t.uploadSoilData}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Upload CSV files containing soil analysis data for different districts and blocks.
+                {language === 'en' 
+                  ? 'Upload CSV files containing soil analysis data for different districts and blocks.'
+                  : language === 'hi'
+                  ? 'विभिन्न जिलों और ब्लॉकों के लिए मिट्टी विश्लेषण डेटा युक्त CSV फाइलें अपलोड करें।'
+                  : 'विविध जिल्हे आणि ब्लॉक्ससाठी माती विश्लेषण डेटा असलेल्या CSV फाइल्स अपलोड करा।'}
               </p>
-              <Button className="w-full">Upload CSV</Button>
+              <Button className="w-full">
+                {language === 'en' ? 'Upload CSV' : language === 'hi' ? 'CSV अपलोड करें' : 'CSV अपलोड करा'}
+              </Button>
             </CardContent>
           </Card>
 
@@ -62,14 +76,20 @@ const Admin = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Database className="h-5 w-5 text-primary" />
-                Manage Prices
+                {t.managePrices}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Manually update market prices or configure automatic updates from APMC data sources.
+                {language === 'en'
+                  ? 'Manually update market prices or configure automatic updates from APMC data sources.'
+                  : language === 'hi'
+                  ? 'मैन्युअल रूप से बाजार मूल्य अपडेट करें या APMC डेटा स्रोतों से स्वचालित अपडेट कॉन्फ़िगर करें।'
+                  : 'मॅन्युअली बाजार किंमती अपडेट करा किंवा APMC डेटा स्रोतांकडून स्वयंचलित अपडेट कॉन्फिगर करा।'}
               </p>
-              <Button className="w-full">Update Prices</Button>
+              <Button className="w-full">
+                {language === 'en' ? 'Update Prices' : language === 'hi' ? 'मूल्य अपडेट करें' : 'किंमती अपडेट करा'}
+              </Button>
             </CardContent>
           </Card>
 
@@ -77,14 +97,20 @@ const Admin = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Database className="h-5 w-5 text-primary" />
-                Crop Catalog
+                {t.editCatalog}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Add, edit, or remove crops from the catalog. Update crop details and requirements.
+                {language === 'en'
+                  ? 'Add, edit, or remove crops from the catalog. Update crop details and requirements.'
+                  : language === 'hi'
+                  ? 'सूची में फसलें जोड़ें, संपादित करें या हटाएं। फसल विवरण और आवश्यकताओं को अपडेट करें।'
+                  : 'सूचीमध्ये पिके जोडा, संपादित करा किंवा काढून टाका। पीक तपशील आणि आवश्यकता अपडेट करा।'}
               </p>
-              <Button className="w-full">Manage Catalog</Button>
+              <Button className="w-full">
+                {language === 'en' ? 'Manage Catalog' : language === 'hi' ? 'सूची प्रबंधित करें' : 'सूची व्यवस्थापित करा'}
+              </Button>
             </CardContent>
           </Card>
 
@@ -92,14 +118,20 @@ const Admin = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Bell className="h-5 w-5 text-primary" />
-                Send Alerts
+                {t.sendAlerts}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Send weather alerts, price notifications, or advisory messages to farmers.
+                {language === 'en'
+                  ? 'Send weather alerts, price notifications, or advisory messages to farmers.'
+                  : language === 'hi'
+                  ? 'किसानों को मौसम अलर्ट, मूल्य सूचनाएं या सलाह संदेश भेजें।'
+                  : 'शेतकऱ्यांना हवामान सूचना, किंमत सूचना किंवा सल्ला संदेश पाठवा।'}
               </p>
-              <Button className="w-full">Create Alert</Button>
+              <Button className="w-full">
+                {language === 'en' ? 'Create Alert' : language === 'hi' ? 'अलर्ट बनाएं' : 'सूचना तयार करा'}
+              </Button>
             </CardContent>
           </Card>
 
@@ -107,14 +139,20 @@ const Admin = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BarChart className="h-5 w-5 text-primary" />
-                Analytics
+                {t.viewAnalytics}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                View detailed analytics about user activity, popular crops, and system usage.
+                {language === 'en'
+                  ? 'View detailed analytics about user activity, popular crops, and system usage.'
+                  : language === 'hi'
+                  ? 'उपयोगकर्ता गतिविधि, लोकप्रिय फसलों और सिस्टम उपयोग के बारे में विस्तृत विश्लेषण देखें।'
+                  : 'वापरकर्ता क्रियाकलाप, लोकप्रिय पिके आणि सिस्टम वापर बद्दल तपशीलवार विश्लेषण पहा।'}
               </p>
-              <Button className="w-full">View Reports</Button>
+              <Button className="w-full">
+                {language === 'en' ? 'View Reports' : language === 'hi' ? 'रिपोर्ट देखें' : 'अहवाल पहा'}
+              </Button>
             </CardContent>
           </Card>
 
@@ -122,14 +160,20 @@ const Admin = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Settings className="h-5 w-5 text-primary" />
-                System Settings
+                {t.systemSettings}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Configure API keys, system parameters, and other administrative settings.
+                {language === 'en'
+                  ? 'Configure API keys, system parameters, and other administrative settings.'
+                  : language === 'hi'
+                  ? 'API कुंजी, सिस्टम पैरामीटर और अन्य प्रशासनिक सेटिंग्स कॉन्फ़िगर करें।'
+                  : 'API की, सिस्टम पॅरामीटर्स आणि इतर प्रशासकीय सेटिंग्ज कॉन्फिगर करा।'}
               </p>
-              <Button className="w-full">Open Settings</Button>
+              <Button className="w-full">
+                {language === 'en' ? 'Open Settings' : language === 'hi' ? 'सेटिंग्स खोलें' : 'सेटिंग्ज उघडा'}
+              </Button>
             </CardContent>
           </Card>
         </div>
@@ -137,7 +181,9 @@ const Admin = () => {
         {/* Recent Activity */}
         <Card className="shadow-soft">
           <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
+            <CardTitle>
+              {language === 'en' ? 'Recent Activity' : language === 'hi' ? 'हाल की गतिविधि' : 'अलीकडील क्रियाकलाप'}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -151,7 +197,9 @@ const Admin = () => {
                 <div key={idx} className="flex items-center justify-between py-3 border-b last:border-0">
                   <div>
                     <p className="font-medium text-foreground">{activity.action}</p>
-                    <p className="text-sm text-muted-foreground">by {activity.user}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {language === 'en' ? 'by' : language === 'hi' ? 'द्वारा' : 'द्वारे'} {activity.user}
+                    </p>
                   </div>
                   <span className="text-sm text-muted-foreground">{activity.time}</span>
                 </div>

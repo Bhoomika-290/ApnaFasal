@@ -7,6 +7,7 @@ import { RecommendationDetailDialog } from "@/components/RecommendationDetailDia
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/lib/translations";
 
+
 const Recommendations = () => {
   const { language } = useLanguage();
   const t = translations[language].recommendations;

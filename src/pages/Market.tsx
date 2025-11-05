@@ -1,8 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Activity } from "lucide-react";
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { translations } from "@/lib/translations";
+
 
 const Market = () => {
+  const { language } = useLanguage();
+  const t = translations[language].market;
+
   const priceHistory = [
     { date: "Jan", wheat: 2200, rice: 3000, cotton: 5200, soybean: 4000 },
     { date: "Feb", wheat: 2300, rice: 3100, cotton: 5400, soybean: 4100 },
@@ -68,9 +74,9 @@ const Market = () => {
       <div className="container mx-auto px-4 py-8 space-y-8">
         {/* Header */}
         <div className="space-y-4">
-          <h1 className="text-4xl font-bold text-foreground">Market Pricing Dashboard</h1>
+          <h1 className="text-4xl font-bold text-foreground">{t.title}</h1>
           <p className="text-lg text-muted-foreground">
-            Real-time and historical market prices across Maharashtra APMCs
+            {t.subtitle}
           </p>
         </div>
 
@@ -79,7 +85,7 @@ const Market = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Activity className="h-5 w-5 text-primary" />
-              6-Month Price Trends (₹/Quintal)
+              {t.priceHistory}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -138,7 +144,7 @@ const Market = () => {
 
         {/* Current Market Prices */}
         <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-foreground">Current Market Prices</h2>
+          <h2 className="text-2xl font-bold text-foreground">{t.currentPrices}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {marketData.map((item, index) => (
               <Card key={index} className="shadow-soft hover:shadow-glow transition-smooth">
@@ -163,19 +169,25 @@ const Market = () => {
                         <span className="text-3xl font-bold text-foreground">
                           ₹{item.currentPrice}
                         </span>
-                        <span className="text-sm text-muted-foreground">/quintal</span>
+                        <span className="text-sm text-muted-foreground">
+                          {language === 'en' ? '/quintal' : language === 'hi' ? '/क्विंटल' : '/क्विंटल'}
+                        </span>
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        Previous: ₹{item.previousPrice}
+                        {language === 'en' ? 'Previous' : language === 'hi' ? 'पिछला' : 'मागील'}: ₹{item.previousPrice}
                       </p>
                     </div>
 
                     <div className="pt-3 border-t space-y-1">
                       <p className="text-sm text-muted-foreground">
-                        <span className="font-medium text-foreground">Volume:</span> {item.volume}
+                        <span className="font-medium text-foreground">
+                          {language === 'en' ? 'Volume' : language === 'hi' ? 'मात्रा' : 'प्रमाण'}:
+                        </span> {item.volume}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        <span className="font-medium text-foreground">Market:</span> {item.market}
+                        <span className="font-medium text-foreground">
+                          {language === 'en' ? 'Market' : language === 'hi' ? 'बाजार' : 'बाजार'}:
+                        </span> {item.market}
                       </p>
                     </div>
                   </div>

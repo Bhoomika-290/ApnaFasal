@@ -6,8 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calculator as CalcIcon, TrendingUp, DollarSign } from "lucide-react";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { translations } from "@/lib/translations";
+
 
 const Calculator = () => {
+  const { language } = useLanguage();
+  const t = translations[language].calculator;
+
   const [area, setArea] = useState("");
   const [selectedCrop, setSelectedCrop] = useState("");
   const [seedCost, setSeedCost] = useState("");
@@ -26,7 +32,7 @@ const Calculator = () => {
 
   const calculateProfit = () => {
     if (!area || !selectedCrop || !seedCost || !fertilizerCost || !laborCost) {
-      toast.error("Please fill all required fields");
+      toast.error(t.fillAllFields);
       return;
     }
 
@@ -54,7 +60,7 @@ const Calculator = () => {
       breakEven: totalCost / crop.avgPrice
     });
 
-    toast.success("Calculation complete!");
+    toast.success(t.success);
   };
 
   return (
@@ -62,9 +68,9 @@ const Calculator = () => {
       <div className="container mx-auto px-4 py-8 space-y-8">
         {/* Header */}
         <div className="space-y-4">
-          <h1 className="text-4xl font-bold text-foreground">Production Cost Calculator</h1>
+          <h1 className="text-4xl font-bold text-foreground">{t.title}</h1>
           <p className="text-lg text-muted-foreground">
-            Calculate your production costs, expected yield, and profit margins
+            {t.subtitle}
           </p>
         </div>
 
@@ -74,16 +80,16 @@ const Calculator = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CalcIcon className="h-5 w-5 text-primary" />
-                Input Details
+                {t.inputDetails}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="area">Cultivation Area (Hectares) *</Label>
+                <Label htmlFor="area">{t.area} *</Label>
                 <Input
                   id="area"
                   type="number"
-                  placeholder="Enter area in hectares"
+                  placeholder={language === 'en' ? 'Enter area in hectares' : language === 'hi' ? 'हेक्टेयर में क्षेत्र दर्ज करें' : 'हेक्टरमध्ये क्षेत्रफळ प्रविष्ट करा'}
                   value={area}
                   onChange={(e) => setArea(e.target.value)}
                   min="0"
@@ -92,10 +98,10 @@ const Calculator = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="crop">Select Crop *</Label>
+                <Label htmlFor="crop">{t.selectCrop} *</Label>
                 <Select value={selectedCrop} onValueChange={setSelectedCrop}>
                   <SelectTrigger id="crop">
-                    <SelectValue placeholder="Choose a crop" />
+                    <SelectValue placeholder={language === 'en' ? 'Choose a crop' : language === 'hi' ? 'फसल चुनें' : 'पीक निवडा'} />
                   </SelectTrigger>
                   <SelectContent>
                     {crops.map((crop) => (
@@ -108,11 +114,11 @@ const Calculator = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="seedCost">Seed Cost (₹) *</Label>
+                <Label htmlFor="seedCost">{t.seedCost} *</Label>
                 <Input
                   id="seedCost"
                   type="number"
-                  placeholder="Enter seed cost"
+                  placeholder={language === 'en' ? 'Enter seed cost' : language === 'hi' ? 'बीज लागत दर्ज करें' : 'बियाणे खर्च प्रविष्ट करा'}
                   value={seedCost}
                   onChange={(e) => setSeedCost(e.target.value)}
                   min="0"
@@ -120,11 +126,11 @@ const Calculator = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="fertilizerCost">Fertilizer & Chemicals (₹) *</Label>
+                <Label htmlFor="fertilizerCost">{t.fertilizerCost} *</Label>
                 <Input
                   id="fertilizerCost"
                   type="number"
-                  placeholder="Enter fertilizer cost"
+                  placeholder={language === 'en' ? 'Enter fertilizer cost' : language === 'hi' ? 'उर्वरक लागत दर्ज करें' : 'खत खर्च प्रविष्ट करा'}
                   value={fertilizerCost}
                   onChange={(e) => setFertilizerCost(e.target.value)}
                   min="0"
@@ -132,11 +138,11 @@ const Calculator = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="laborCost">Labor & Machinery (₹) *</Label>
+                <Label htmlFor="laborCost">{t.laborCost} *</Label>
                 <Input
                   id="laborCost"
                   type="number"
-                  placeholder="Enter labor cost"
+                  placeholder={language === 'en' ? 'Enter labor cost' : language === 'hi' ? 'श्रम लागत दर्ज करें' : 'मजुरी खर्च प्रविष्ट करा'}
                   value={laborCost}
                   onChange={(e) => setLaborCost(e.target.value)}
                   min="0"
@@ -144,11 +150,11 @@ const Calculator = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="otherCost">Other Costs (₹)</Label>
+                <Label htmlFor="otherCost">{t.otherCosts}</Label>
                 <Input
                   id="otherCost"
                   type="number"
-                  placeholder="Transport, storage, etc."
+                  placeholder={language === 'en' ? 'Transport, storage, etc.' : language === 'hi' ? 'परिवहन, भंडारण, आदि' : 'वाहतूक, साठवण, इ.'}
                   value={otherCost}
                   onChange={(e) => setOtherCost(e.target.value)}
                   min="0"
@@ -156,7 +162,7 @@ const Calculator = () => {
               </div>
 
               <Button onClick={calculateProfit} className="w-full">
-                Calculate Profit
+                {t.calculate}
               </Button>
             </CardContent>
           </Card>
@@ -166,7 +172,7 @@ const Calculator = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-primary" />
-                Results
+                {t.results}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -174,28 +180,28 @@ const Calculator = () => {
                 <div className="space-y-6">
                   <div className="p-4 rounded-lg bg-muted/50 space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground">Total Cost</span>
+                      <span className="text-muted-foreground">{t.totalCost}</span>
                       <span className="text-xl font-bold text-foreground">
                         ₹{result.totalCost.toLocaleString()}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground">Estimated Yield</span>
+                      <span className="text-muted-foreground">{t.estimatedYield}</span>
                       <span className="text-xl font-bold text-foreground">
-                        {result.estimatedYield.toFixed(1)} quintals
+                        {result.estimatedYield.toFixed(1)} {language === 'en' ? 'quintals' : language === 'hi' ? 'क्विंटल' : 'क्विंटल'}
                       </span>
                     </div>
                   </div>
 
                   <div className="p-4 rounded-lg bg-primary/5 border-2 border-primary/20 space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground">Expected Revenue</span>
+                      <span className="text-muted-foreground">{t.expectedRevenue}</span>
                       <span className="text-2xl font-bold text-primary">
                         ₹{result.estimatedRevenue.toLocaleString()}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground">Net Profit</span>
+                      <span className="text-muted-foreground">{t.profit}</span>
                       <span className={`text-2xl font-bold ${
                         result.profit >= 0 ? "text-primary" : "text-destructive"
                       }`}>
@@ -203,7 +209,7 @@ const Calculator = () => {
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground">Profit Margin</span>
+                      <span className="text-muted-foreground">{t.profitMargin}</span>
                       <span className={`text-xl font-bold ${
                         result.profitMargin >= 0 ? "text-primary" : "text-destructive"
                       }`}>
@@ -215,21 +221,25 @@ const Calculator = () => {
                   <div className="p-4 rounded-lg bg-accent/5 border border-accent/20">
                     <div className="flex items-center gap-2 mb-2">
                       <DollarSign className="h-5 w-5 text-accent" />
-                      <span className="font-semibold text-foreground">Break-Even Point</span>
+                      <span className="font-semibold text-foreground">{t.breakEven}</span>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      You need to sell at least{" "}
-                      <span className="font-bold text-accent">
-                        {result.breakEven.toFixed(1)} quintals
-                      </span>{" "}
-                      to recover your costs
+                      {language === 'en' 
+                        ? `You need to sell at least ${result.breakEven.toFixed(1)} quintals to recover your costs`
+                        : language === 'hi'
+                        ? `आपको अपनी लागत वसूलने के लिए कम से कम ${result.breakEven.toFixed(1)} क्विंटल बेचने की जरूरत है`
+                        : `आपल्या खर्चाची भरपाई करण्यासाठी तुम्हाला किमान ${result.breakEven.toFixed(1)} क्विंटल विकावे लागतील`}
                     </p>
                   </div>
 
                   {result.profit < 0 && (
                     <div className="p-4 rounded-lg bg-destructive/5 border border-destructive/20">
                       <p className="text-sm text-destructive font-medium">
-                        ⚠️ Warning: Current market prices may result in losses. Consider alternative crops or wait for better market conditions.
+                        {language === 'en'
+                          ? '⚠️ Warning: Current market prices may result in losses. Consider alternative crops or wait for better market conditions.'
+                          : language === 'hi'
+                          ? '⚠️ चेतावनी: वर्तमान बाजार मूल्य के परिणामस्वरूप नुकसान हो सकता है। वैकल्पिक फसलों पर विचार करें या बेहतर बाजार स्थितियों की प्रतीक्षा करें।'
+                          : '⚠️ चेतावणी: सध्याच्या बाजार किंमतींमुळे तोटा होऊ शकतो. पर्यायी पिके विचारात घ्या किंवा चांगल्या बाजार परिस्थितीची प्रतीक्षा करा।'}
                       </p>
                     </div>
                   )}
@@ -238,7 +248,11 @@ const Calculator = () => {
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <CalcIcon className="h-16 w-16 text-muted-foreground mb-4" />
                   <p className="text-muted-foreground">
-                    Fill in the form to calculate your production costs and expected profits
+                    {language === 'en'
+                      ? 'Fill in the form to calculate your production costs and expected profits'
+                      : language === 'hi'
+                      ? 'अपनी उत्पादन लागत और अपेक्षित लाभ की गणना करने के लिए फॉर्म भरें'
+                      : 'आपल्या उत्पादन खर्च आणि अपेक्षित नफा मोजण्यासाठी फॉर्म भरा'}
                   </p>
                 </div>
               )}
