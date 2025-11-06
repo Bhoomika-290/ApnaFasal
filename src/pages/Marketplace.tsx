@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ShoppingCart, Package, MapPin, Phone, Search } from "lucide-react";
 import { MarketplaceActionDialog } from "@/components/MarketplaceActionDialog";
+import { PostListingDialog } from "@/components/PostListingDialog";
+import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/lib/translations";
 
@@ -32,8 +34,10 @@ const Marketplace = () => {
     type: "contact" | "offer";
     listing: any;
   }>({ open: false, type: "contact", listing: null });
+  const [postDialogOpen, setPostDialogOpen] = useState(false);
+  const { toast } = useToast();
 
-  const listings: Listing[] = [
+  const initialListings: Listing[] = [
     {
       id: 1,
       type: "sell",
@@ -102,7 +106,9 @@ const Marketplace = () => {
     },
   ];
 
-  const filteredListings = listings.filter(listing => {
+  const [listingsState, setListingsState] = useState<Listing[]>(initialListings);
+
+  const filteredListings = listingsState.filter(listing => {
     const matchesType = filterType === "all" || listing.type === filterType;
     const matchesSearch = 
       listing.crop.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -110,6 +116,25 @@ const Marketplace = () => {
       listing.seller.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesType && matchesSearch;
   });
+
+  const handlePostSubmit = (data: Omit<Listing, "id" | "date"> | any) => {
+    const id = Date.now();
+    const newListing: Listing = {
+      id,
+      type: data.type,
+      crop: data.crop,
+      quantity: data.quantity,
+      price: data.price,
+      location: data.location || "",
+      seller: data.seller || "",
+      contact: data.contact || "",
+      date: "Just now",
+    };
+
+  setListingsState((prev) => [newListing, ...prev]);
+    toast({ title: "Listing Posted", description: `${newListing.crop} posted successfully.` });
+    setPostDialogOpen(false);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-hero">
@@ -145,13 +170,15 @@ const Marketplace = () => {
                   <SelectItem value="sell">{t.sellOffers}</SelectItem>
                 </SelectContent>
               </Select>
-              <Button className="whitespace-nowrap">
+              <Button className="whitespace-nowrap" onClick={() => setPostDialogOpen(true)}>
                 <Package className="h-4 w-4 mr-2" />
                 {t.postListing}
               </Button>
             </div>
           </CardContent>
         </Card>
+
+        {/* History removed per request */}
 
         {/* Listings Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -237,6 +264,11 @@ const Marketplace = () => {
         onOpenChange={(open) => setActionDialog({ ...actionDialog, open })}
         type={actionDialog.type}
         listing={actionDialog.listing}
+      />
+      <PostListingDialog
+        open={postDialogOpen}
+        onOpenChange={(open) => setPostDialogOpen(open)}
+        onSubmit={handlePostSubmit}
       />
     </div>
   );

@@ -4,13 +4,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Lightbulb, TrendingUp, AlertCircle, Calendar, MapPin } from "lucide-react";
 import { RecommendationDetailDialog } from "@/components/RecommendationDetailDialog";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { translations } from "@/lib/translations";
+import { useTranslation } from "@/hooks/useTranslation";
 
 
 const Recommendations = () => {
-  const { language } = useLanguage();
-  const t = translations[language].recommendations;
+  const { t } = useTranslation();
+  const tr = (k: string) => t(`recommendations.${k}`);
   const [selectedRec, setSelectedRec] = useState<any>(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const recommendations = [
@@ -83,9 +82,9 @@ const Recommendations = () => {
   };
 
   const getRiskText = (risk: string) => {
-    if (risk === "Low") return t.lowRisk;
-    if (risk === "Medium") return t.mediumRisk;
-    return t.highRisk;
+    if (risk === "Low") return tr("lowRisk");
+    if (risk === "Medium") return tr("mediumRisk");
+    return tr("highRisk");
   };
 
   return (
@@ -93,9 +92,9 @@ const Recommendations = () => {
       <div className="container mx-auto px-4 py-8 space-y-8">
         {/* Header */}
         <div className="space-y-4">
-          <h1 className="text-4xl font-bold text-foreground">{t.title}</h1>
+          <h1 className="text-4xl font-bold text-foreground">{tr("title")}</h1>
           <p className="text-lg text-muted-foreground">
-            {t.subtitle}
+            {tr("subtitle")}
           </p>
         </div>
 
@@ -106,10 +105,10 @@ const Recommendations = () => {
               <Lightbulb className="h-6 w-6 text-primary mt-1" />
               <div>
                 <h3 className="font-semibold text-foreground mb-1">
-                  {t.infoTitle}
+                  {tr("infoTitle")}
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  {t.infoDesc}
+                  {tr("infoDesc")}
                 </p>
               </div>
             </div>
@@ -136,22 +135,22 @@ const Recommendations = () => {
                         {rec.crop}
                         {rec.rank === 1 && (
                           <Badge className="bg-gradient-accent text-accent-foreground">
-                            {t.topPick}
+                            {tr("topPick")}
                           </Badge>
                         )}
                       </CardTitle>
                       <div className="flex items-center gap-2 mt-1">
                         <Badge className="bg-primary/10 text-primary border-primary/20">
-                          {t.score}: {rec.score}/10
+                          {tr("score")}: {rec.score}/10
                         </Badge>
                         <Badge className={getRiskColor(rec.risk)}>
-                          {getRiskText(rec.risk)} {t.risk}
+                          {getRiskText(rec.risk)} {tr("risk")}
                         </Badge>
                       </div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-muted-foreground">{t.expectedProfit}</p>
+                    <p className="text-sm text-muted-foreground">{tr("expectedProfit")}</p>
                     <p className="text-2xl font-bold text-primary">{rec.expectedProfit}</p>
                   </div>
                 </div>
@@ -160,18 +159,18 @@ const Recommendations = () => {
                 {/* Key Metrics Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 rounded-lg bg-muted/30">
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">{t.soilSuitability}</p>
+                    <p className="text-sm text-muted-foreground mb-1">{tr("soilSuitability")}</p>
                     <p className="font-semibold text-foreground">{rec.soilSuitability}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">{t.marketTrend}</p>
+                    <p className="text-sm text-muted-foreground mb-1">{tr("marketTrend")}</p>
                     <div className="flex items-center gap-1">
                       <TrendingUp className="h-4 w-4 text-primary" />
                       <p className="font-semibold text-foreground">{rec.marketTrend}</p>
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">{t.sowingWindow}</p>
+                    <p className="text-sm text-muted-foreground mb-1">{tr("sowingWindow")}</p>
                     <div className="flex items-center gap-1">
                       <Calendar className="h-4 w-4 text-muted-foreground" />
                       <p className="font-semibold text-foreground">{rec.sowingWindow}</p>
@@ -180,16 +179,19 @@ const Recommendations = () => {
                 </div>
 
                 {/* Reason */}
-                <div className="flex items-start gap-3 p-4 rounded-lg bg-primary/5 border border-primary/20">
-                  <AlertCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                  <p className="text-sm text-foreground">{rec.reason}</p>
-                </div>
+                  <div className="flex items-start gap-3 p-4 rounded-lg bg-primary/5 border border-primary/20">
+                    <AlertCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <div className="flex flex-col">
+                      <p className="text-sm text-muted-foreground mb-1">{tr("reason")}</p>
+                      <p className="text-sm text-foreground">{rec.reason}</p>
+                    </div>
+                  </div>
 
                 {/* Districts */}
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <MapPin className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm font-medium text-foreground">{t.suitableDistricts}:</span>
+                    <span className="text-sm font-medium text-foreground">{tr("suitableDistricts")}:</span>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {rec.districts.map((district, idx) => (
@@ -208,7 +210,7 @@ const Recommendations = () => {
                     setDetailOpen(true);
                   }}
                 >
-                  {t.viewDetailedAnalysis}
+                  {tr("viewDetailedAnalysis")}
                 </Button>
               </CardContent>
             </Card>

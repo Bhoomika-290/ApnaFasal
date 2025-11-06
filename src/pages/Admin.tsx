@@ -1,19 +1,71 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BarChart, Users, Database, Bell, Upload, Settings } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { translations } from "@/lib/translations";
+import { useState, useEffect } from "react";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useToast } from "@/hooks/use-toast";
+import { ManageCatalogDialog } from "@/components/ManageCatalogDialog";
+import { UpdatePricesDialog } from "@/components/UpdatePricesDialog";
+import { CreateAlertDialog } from "@/components/CreateAlertDialog";
+import { ViewReportsDialog } from "@/components/ViewReportsDialog";
+import { TransactionHistoryDialog } from "@/components/TransactionHistoryDialog";
+import { supabase } from "@/integrations/supabase/client";
 
 
 const Admin = () => {
-  const { language } = useLanguage();
-  const t = translations[language].admin;
+  const { t, language } = useTranslation();
+  const { toast } = useToast();
+  const [manageOpen, setManageOpen] = useState(false);
+  const [updateOpen, setUpdateOpen] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [reportsOpen, setReportsOpen] = useState(false);
+  const [transactionOpen, setTransactionOpen] = useState(false);
+
+  // Mock transactions and users for the demo
+  const [transactions] = useState<Array<{ id: number; crop: string; type: 'buy' | 'sell'; quantity: number; price: number; date: string }>>([
+    { id: 1, crop: "Wheat", type: "sell", quantity: 50, price: 2500, date: "2025-11-01" },
+    { id: 2, crop: "Rice", type: "buy", quantity: 30, price: 1800, date: "2025-11-02" },
+  ]);
+
+  // Try to fetch live transaction count from Supabase; fall back to mock data if not available
+  const [transactionCount, setTransactionCount] = useState<number>(transactions.length);
+
+  useEffect(() => {
+    let mounted = true;
+    const loadCount = async () => {
+      try {
+          const client: any = supabase;
+          const res = await client.from('transactions').select('id', { count: 'exact', head: true });
+          // supabase v2 returns { count } when head: true and count requested
+          const count = res.count ?? (res.data && Array.isArray(res.data) ? res.data.length : undefined);
+          if (mounted && typeof count === 'number') setTransactionCount(count);
+        } catch (err) {
+        // ignore and keep mock
+      }
+    };
+    loadCount();
+    return () => { mounted = false; };
+  }, []);
+
+  // Compute today's buys/sells breakdown from mock transactions; if none for today, fall back to totals
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const todays = transactions.filter((tr) => tr.date === todayStr);
+  const sourceForBreakdown = todays.length > 0 ? todays : transactions;
+  const buysCount = sourceForBreakdown.filter((tr) => tr.type === 'buy').length;
+  const sellsCount = sourceForBreakdown.filter((tr) => tr.type === 'sell').length;
+  const breakdownTotal = sourceForBreakdown.length || transactionCount;
+
+  const [users] = useState<Array<{ id: number; name: string; status: 'active' | 'completed' }>>([
+    { id: 1, name: "Rahul", status: "active" },
+    { id: 2, name: "Sonia", status: "completed" },
+    { id: 3, name: "Asha", status: "active" },
+  ]);
 
   const stats = [
-    { label: t.totalUsers, value: "2,847", icon: Users, change: "+12%" },
-    { label: t.activeCrops, value: "247", icon: Database, change: "+5%" },
-    { label: t.totalListings, value: "156", icon: Database, change: "+8%" },
-    { label: t.apiCalls, value: "1,243", icon: Database, change: "+15%" },
+    { label: t("admin.totalUsers"), value: "2,847", icon: Users, change: "+12%" },
+    { label: t("admin.activeCrops"), value: "247", icon: Database, change: "+5%" },
+    { label: t("admin.totalListings"), value: "156", icon: Database, change: "+8%" },
+    { label: t("admin.transactionsToday") ?? t("admin.transactionHistory"), value: String(transactionCount), icon: Database, change: "+0%" },
   ];
 
   return (
@@ -21,9 +73,9 @@ const Admin = () => {
       <div className="container mx-auto px-4 py-8 space-y-8">
         {/* Header */}
         <div className="space-y-4">
-          <h1 className="text-4xl font-bold text-foreground">{t.title}</h1>
+          <h1 className="text-4xl font-bold text-foreground">{t("admin.title")}</h1>
           <p className="text-lg text-muted-foreground">
-            {t.subtitle}
+            {t("admin.subtitle")}
           </p>
         </div>
 
@@ -37,7 +89,7 @@ const Admin = () => {
                     <p className="text-sm text-muted-foreground">{stat.label}</p>
                     <p className="text-3xl font-bold text-foreground mt-1">{stat.value}</p>
                     <p className="text-sm text-primary mt-1">
-                      {stat.change} {language === 'en' ? 'from last month' : language === 'hi' ? 'पिछले महीने से' : 'मागील महिन्यापासून'}
+                      {stat.change} {t("admin.fromLastMonth")}
                     </p>
                   </div>
                   <div className="p-3 rounded-lg bg-gradient-primary">
@@ -55,19 +107,13 @@ const Admin = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Upload className="h-5 w-5 text-primary" />
-                {t.uploadSoilData}
+                {t("admin.uploadSoilData")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                {language === 'en' 
-                  ? 'Upload CSV files containing soil analysis data for different districts and blocks.'
-                  : language === 'hi'
-                  ? 'विभिन्न जिलों और ब्लॉकों के लिए मिट्टी विश्लेषण डेटा युक्त CSV फाइलें अपलोड करें।'
-                  : 'विविध जिल्हे आणि ब्लॉक्ससाठी माती विश्लेषण डेटा असलेल्या CSV फाइल्स अपलोड करा।'}
-              </p>
-              <Button className="w-full">
-                {language === 'en' ? 'Upload CSV' : language === 'hi' ? 'CSV अपलोड करें' : 'CSV अपलोड करा'}
+              <p className="text-sm text-muted-foreground">{t("admin.uploadCsvDesc")}</p>
+              <Button className="w-full" onClick={() => toast({ title: t("admin.uploadCsvBtn"), description: t("admin.uploadCsvDesc") } )}>
+                {t("admin.uploadCsvBtn")}
               </Button>
             </CardContent>
           </Card>
@@ -76,19 +122,13 @@ const Admin = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Database className="h-5 w-5 text-primary" />
-                {t.managePrices}
+                {t("admin.managePrices")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                {language === 'en'
-                  ? 'Manually update market prices or configure automatic updates from APMC data sources.'
-                  : language === 'hi'
-                  ? 'मैन्युअल रूप से बाजार मूल्य अपडेट करें या APMC डेटा स्रोतों से स्वचालित अपडेट कॉन्फ़िगर करें।'
-                  : 'मॅन्युअली बाजार किंमती अपडेट करा किंवा APMC डेटा स्रोतांकडून स्वयंचलित अपडेट कॉन्फिगर करा।'}
-              </p>
-              <Button className="w-full">
-                {language === 'en' ? 'Update Prices' : language === 'hi' ? 'मूल्य अपडेट करें' : 'किंमती अपडेट करा'}
+              <p className="text-sm text-muted-foreground">{t("admin.managePricesDesc")}</p>
+              <Button className="w-full" onClick={() => setUpdateOpen(true)}>
+                {t("admin.updatePricesBtn")}
               </Button>
             </CardContent>
           </Card>
@@ -97,19 +137,13 @@ const Admin = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Database className="h-5 w-5 text-primary" />
-                {t.editCatalog}
+                {t("admin.editCatalog")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                {language === 'en'
-                  ? 'Add, edit, or remove crops from the catalog. Update crop details and requirements.'
-                  : language === 'hi'
-                  ? 'सूची में फसलें जोड़ें, संपादित करें या हटाएं। फसल विवरण और आवश्यकताओं को अपडेट करें।'
-                  : 'सूचीमध्ये पिके जोडा, संपादित करा किंवा काढून टाका। पीक तपशील आणि आवश्यकता अपडेट करा।'}
-              </p>
-              <Button className="w-full">
-                {language === 'en' ? 'Manage Catalog' : language === 'hi' ? 'सूची प्रबंधित करें' : 'सूची व्यवस्थापित करा'}
+              <p className="text-sm text-muted-foreground">{t("admin.editCatalogDesc")}</p>
+              <Button className="w-full" onClick={() => setManageOpen(true)}>
+                {t("admin.manageCatalogBtn")}
               </Button>
             </CardContent>
           </Card>
@@ -118,19 +152,13 @@ const Admin = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Bell className="h-5 w-5 text-primary" />
-                {t.sendAlerts}
+                {t("admin.sendAlerts")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                {language === 'en'
-                  ? 'Send weather alerts, price notifications, or advisory messages to farmers.'
-                  : language === 'hi'
-                  ? 'किसानों को मौसम अलर्ट, मूल्य सूचनाएं या सलाह संदेश भेजें।'
-                  : 'शेतकऱ्यांना हवामान सूचना, किंमत सूचना किंवा सल्ला संदेश पाठवा।'}
-              </p>
-              <Button className="w-full">
-                {language === 'en' ? 'Create Alert' : language === 'hi' ? 'अलर्ट बनाएं' : 'सूचना तयार करा'}
+              <p className="text-sm text-muted-foreground">{t("admin.sendAlertsDesc")}</p>
+              <Button className="w-full" onClick={() => setAlertOpen(true)}>
+                {t("admin.createAlertBtn")}
               </Button>
             </CardContent>
           </Card>
@@ -139,19 +167,13 @@ const Admin = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BarChart className="h-5 w-5 text-primary" />
-                {t.viewAnalytics}
+                {t("admin.viewAnalytics")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                {language === 'en'
-                  ? 'View detailed analytics about user activity, popular crops, and system usage.'
-                  : language === 'hi'
-                  ? 'उपयोगकर्ता गतिविधि, लोकप्रिय फसलों और सिस्टम उपयोग के बारे में विस्तृत विश्लेषण देखें।'
-                  : 'वापरकर्ता क्रियाकलाप, लोकप्रिय पिके आणि सिस्टम वापर बद्दल तपशीलवार विश्लेषण पहा।'}
-              </p>
-              <Button className="w-full">
-                {language === 'en' ? 'View Reports' : language === 'hi' ? 'रिपोर्ट देखें' : 'अहवाल पहा'}
+              <p className="text-sm text-muted-foreground">{t("admin.viewAnalyticsDesc")}</p>
+              <Button className="w-full" onClick={() => setReportsOpen(true)}>
+                {t("admin.viewReportsBtn")}
               </Button>
             </CardContent>
           </Card>
@@ -159,20 +181,14 @@ const Admin = () => {
           <Card className="shadow-soft hover:shadow-glow transition-smooth">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Settings className="h-5 w-5 text-primary" />
-                {t.systemSettings}
+                <Database className="h-5 w-5 text-primary" />
+                {t("admin.transactionHistory")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                {language === 'en'
-                  ? 'Configure API keys, system parameters, and other administrative settings.'
-                  : language === 'hi'
-                  ? 'API कुंजी, सिस्टम पैरामीटर और अन्य प्रशासनिक सेटिंग्स कॉन्फ़िगर करें।'
-                  : 'API की, सिस्टम पॅरामीटर्स आणि इतर प्रशासकीय सेटिंग्ज कॉन्फिगर करा।'}
-              </p>
-              <Button className="w-full">
-                {language === 'en' ? 'Open Settings' : language === 'hi' ? 'सेटिंग्स खोलें' : 'सेटिंग्ज उघडा'}
+              <p className="text-sm text-muted-foreground">{t("admin.transactionHistoryDesc")}</p>
+              <Button className="w-full" onClick={() => setTransactionOpen(true)}>
+                {t("admin.viewTransactionsBtn")}
               </Button>
             </CardContent>
           </Card>
@@ -181,9 +197,7 @@ const Admin = () => {
         {/* Recent Activity */}
         <Card className="shadow-soft">
           <CardHeader>
-            <CardTitle>
-              {language === 'en' ? 'Recent Activity' : language === 'hi' ? 'हाल की गतिविधि' : 'अलीकडील क्रियाकलाप'}
-            </CardTitle>
+            <CardTitle>{t("admin.recentActivity")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -197,9 +211,7 @@ const Admin = () => {
                 <div key={idx} className="flex items-center justify-between py-3 border-b last:border-0">
                   <div>
                     <p className="font-medium text-foreground">{activity.action}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {language === 'en' ? 'by' : language === 'hi' ? 'द्वारा' : 'द्वारे'} {activity.user}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{t("admin.by")} {activity.user}</p>
                   </div>
                   <span className="text-sm text-muted-foreground">{activity.time}</span>
                 </div>
@@ -207,7 +219,18 @@ const Admin = () => {
             </div>
           </CardContent>
         </Card>
-      </div>
+        </div>
+
+      <ManageCatalogDialog open={manageOpen} onOpenChange={setManageOpen} />
+      <UpdatePricesDialog open={updateOpen} onOpenChange={setUpdateOpen} />
+      <CreateAlertDialog open={alertOpen} onOpenChange={setAlertOpen} />
+    <ViewReportsDialog open={reportsOpen} onOpenChange={setReportsOpen} transactionsToday={transactionCount} transactionsBreakdown={{ buys: buysCount, sells: sellsCount, total: breakdownTotal }} />
+      <TransactionHistoryDialog
+        open={transactionOpen}
+        onOpenChange={setTransactionOpen}
+        transactions={transactions}
+        users={users}
+      />
     </div>
   );
 };

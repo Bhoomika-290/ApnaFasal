@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Droplets, Cloud, AlertTriangle } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const Dashboard = () => {
   const priceData = [
@@ -27,16 +28,18 @@ const Dashboard = () => {
     { id: 3, type: "advisory", message: "Pest alert: Whitefly detected in Jalgaon", severity: "high" },
   ];
 
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen bg-gradient-hero">
       <div className="container mx-auto px-4 py-8 space-y-8">
         {/* Hero Section */}
         <div className="text-center space-y-4 py-8">
           <h1 className="text-4xl md:text-5xl font-bold text-foreground">
-            Welcome to ApnaFasal
+            {t("dashboard.title")}
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Your complete agricultural decision-support platform for Maharashtra
+            {t("dashboard.subtitle")}
           </p>
         </div>
 
@@ -45,7 +48,7 @@ const Dashboard = () => {
           <Card className="shadow-soft">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Active Crops
+                {t("dashboard.activeCrops")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -57,7 +60,7 @@ const Dashboard = () => {
           <Card className="shadow-soft">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Market Prices
+                {t("market.title")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -69,7 +72,7 @@ const Dashboard = () => {
           <Card className="shadow-soft">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Active Listings
+                {t("dashboard.marketListings")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -81,7 +84,7 @@ const Dashboard = () => {
           <Card className="shadow-soft">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Districts Covered
+                {t("dashboard.topPriceMovers")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -95,12 +98,12 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Top Price Movers */}
           <Card className="shadow-soft">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-primary" />
-                Top Price Movers Today
-              </CardTitle>
-            </CardHeader>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-primary" />
+                  {t("dashboard.topPriceMovers")}
+                </CardTitle>
+              </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={priceData}>
@@ -125,7 +128,7 @@ const Dashboard = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Cloud className="h-5 w-5 text-primary" />
-                7-Day Weather Forecast
+                {t("dashboard.weather")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -166,7 +169,7 @@ const Dashboard = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-accent" />
-              Active Alerts & Advisories
+              {t("dashboard.activeAlerts")}
             </CardTitle>
           </CardHeader>
           <CardContent>

@@ -8,6 +8,7 @@ import { Calculator as CalcIcon, TrendingUp, DollarSign } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/lib/translations";
+import { Switch } from "@/components/ui/switch";
 
 
 const Calculator = () => {
@@ -20,6 +21,7 @@ const Calculator = () => {
   const [fertilizerCost, setFertilizerCost] = useState("");
   const [laborCost, setLaborCost] = useState("");
   const [otherCost, setOtherCost] = useState("");
+  const [isPerHectare, setIsPerHectare] = useState(true);
   const [result, setResult] = useState<any>(null);
 
   const crops = [
@@ -37,11 +39,16 @@ const Calculator = () => {
     }
 
     const areaNum = parseFloat(area);
-    const totalCost = 
-      parseFloat(seedCost) + 
-      parseFloat(fertilizerCost) + 
-      parseFloat(laborCost) + 
+    // Parse inputs safely
+    const perUnitCost =
+      (parseFloat(seedCost) || 0) +
+      (parseFloat(fertilizerCost) || 0) +
+      (parseFloat(laborCost) || 0) +
       (parseFloat(otherCost) || 0);
+
+    // If costs are entered as per-hectare, scale by area. Otherwise treat them as totals
+    // for the whole provided area.
+    const totalCost = isPerHectare ? perUnitCost * areaNum : perUnitCost;
     
     const crop = crops.find(c => c.name === selectedCrop);
     if (!crop) return;
@@ -113,12 +120,28 @@ const Calculator = () => {
                 </Select>
               </div>
 
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Label className="mb-0">{t.costUnitLabel}</Label>
+                  <Switch checked={isPerHectare} onCheckedChange={(v) => setIsPerHectare(Boolean(v))} />
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {isPerHectare ? t.perHectare : t.totalForArea}
+                </div>
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="seedCost">{t.seedCost} *</Label>
                 <Input
                   id="seedCost"
                   type="number"
-                  placeholder={language === 'en' ? 'Enter seed cost' : language === 'hi' ? 'बीज लागत दर्ज करें' : 'बियाणे खर्च प्रविष्ट करा'}
+                  placeholder={
+                    language === 'en'
+                      ? `Enter seed cost (${isPerHectare ? t.perHectare : t.totalForArea})`
+                      : language === 'hi'
+                      ? `बीज लागत दर्ज करें (${isPerHectare ? t.perHectare : t.totalForArea})`
+                      : `बियाणे खर्च प्रविष्ट करा (${isPerHectare ? t.perHectare : t.totalForArea})`
+                  }
                   value={seedCost}
                   onChange={(e) => setSeedCost(e.target.value)}
                   min="0"
@@ -130,7 +153,13 @@ const Calculator = () => {
                 <Input
                   id="fertilizerCost"
                   type="number"
-                  placeholder={language === 'en' ? 'Enter fertilizer cost' : language === 'hi' ? 'उर्वरक लागत दर्ज करें' : 'खत खर्च प्रविष्ट करा'}
+                  placeholder={
+                    language === 'en'
+                      ? `Enter fertilizer cost (${isPerHectare ? t.perHectare : t.totalForArea})`
+                      : language === 'hi'
+                      ? `उर्वरक लागत दर्ज करें (${isPerHectare ? t.perHectare : t.totalForArea})`
+                      : `खत खर्च प्रविष्ट करा (${isPerHectare ? t.perHectare : t.totalForArea})`
+                  }
                   value={fertilizerCost}
                   onChange={(e) => setFertilizerCost(e.target.value)}
                   min="0"
@@ -142,7 +171,13 @@ const Calculator = () => {
                 <Input
                   id="laborCost"
                   type="number"
-                  placeholder={language === 'en' ? 'Enter labor cost' : language === 'hi' ? 'श्रम लागत दर्ज करें' : 'मजुरी खर्च प्रविष्ट करा'}
+                  placeholder={
+                    language === 'en'
+                      ? `Enter labor cost (${isPerHectare ? t.perHectare : t.totalForArea})`
+                      : language === 'hi'
+                      ? `श्रम लागत दर्ज करें (${isPerHectare ? t.perHectare : t.totalForArea})`
+                      : `मजुरी खर्च प्रविष्ट करा (${isPerHectare ? t.perHectare : t.totalForArea})`
+                  }
                   value={laborCost}
                   onChange={(e) => setLaborCost(e.target.value)}
                   min="0"
@@ -154,7 +189,13 @@ const Calculator = () => {
                 <Input
                   id="otherCost"
                   type="number"
-                  placeholder={language === 'en' ? 'Transport, storage, etc.' : language === 'hi' ? 'परिवहन, भंडारण, आदि' : 'वाहतूक, साठवण, इ.'}
+                  placeholder={
+                    language === 'en'
+                      ? `${language === 'en' ? 'Transport, storage, etc.' : ''} (${isPerHectare ? t.perHectare : t.totalForArea})`
+                      : language === 'hi'
+                      ? `परिवहन, भंडारण, आदि (${isPerHectare ? t.perHectare : t.totalForArea})`
+                      : `वाहतूक, साठवण, इ. (${isPerHectare ? t.perHectare : t.totalForArea})`
+                  }
                   value={otherCost}
                   onChange={(e) => setOtherCost(e.target.value)}
                   min="0"
