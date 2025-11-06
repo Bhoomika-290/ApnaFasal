@@ -708,5 +708,4 @@ export const translations = {
     rememberMe: "मला लक्षात ठेवा",
   },
 };
-
 export type TranslationKey = keyof typeof translations.en;

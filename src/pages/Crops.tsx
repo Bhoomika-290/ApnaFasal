@@ -7,7 +7,7 @@ import { Search, Sprout, Calendar, MapPin, Droplets, Plus } from "lucide-react";
 import { CropDetailDialog } from "@/components/CropDetailDialog";
 import { AddCropDialog } from "@/components/AddCropDialog";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { translations } from "@/lib/translations";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface Crop {
   id: number;
@@ -24,8 +24,68 @@ interface Crop {
 }
 
 const Crops = () => {
-  const { language } = useLanguage();
-  const t = translations[language].crops;
+  const { t } = useTranslation();
+  const tx = (k: string) => t(`crops.${k}`);
+
+  const slug = (s: string) =>
+    s
+      .toString()
+      .toLowerCase()
+      .replace(/\(.+\)/, "")
+      .replace(/[^a-z0-9]+/g, "_")
+      .replace(/^_|_$/g, "");
+  const resolveKey = (base: string, rawKey: string) => {
+    const candidate = rawKey;
+    const alt = rawKey.replace(/_/g, "");
+    const v1 = t(`${base}.${candidate}`);
+    if (v1 !== `${base}.${candidate}`) return v1;
+    const v2 = t(`${base}.${alt}`);
+    if (v2 !== `${base}.${alt}`) return v2;
+    return undefined;
+  };
+
+  const tCropName = (name: string) => {
+    const key = slug(name);
+    const v = resolveKey("market.cropLabels", key);
+    return v ?? name;
+  };
+
+  const tSeason = (season: string) => {
+    const key = slug(season);
+    const v = resolveKey("crops.seasons", key);
+    return v ?? season;
+  };
+
+  const tRegion = (region: string) => {
+    const key = slug(region);
+    const v = resolveKey("crops.regionLabels", key);
+    return v ?? region;
+  };
+
+  const tSoil = (soil: string) => {
+    const key = slug(soil);
+    const v = resolveKey("crops.soilTypes", key);
+    return v ?? soil;
+  };
+
+  const tWater = (water: string) => {
+    const key = slug(water);
+    const v = resolveKey("crops.waterRequirements", key);
+    return v ?? water;
+  };
+
+  const tDuration = (dur: string) => {
+    if (!dur) return dur;
+    let out = dur;
+    // translate unit words and parenthetical "first harvest"
+    out = out.replace(/\b3-4 years\b/gi, (match) => match); // keep ranges intact, replace units below
+    out = out.replace(/\byears\b/gi, t('common.years'));
+    out = out.replace(/\byear\b/gi, t('common.year'));
+    out = out.replace(/\bmonths\b/gi, t('common.months'));
+    out = out.replace(/\bmonth\b/gi, t('common.month'));
+    out = out.replace(/\(first harvest\)/i, `(${t('crops.firstHarvest')})`);
+    return out;
+  };
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCrop, setSelectedCrop] = useState<Crop | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
@@ -189,9 +249,9 @@ const Crops = () => {
       <div className="container mx-auto px-4 py-8 space-y-8">
         {/* Header */}
         <div className="space-y-4">
-          <h1 className="text-4xl font-bold text-foreground">{t.title}</h1>
+          <h1 className="text-4xl font-bold text-foreground">{tx('title')}</h1>
           <p className="text-lg text-muted-foreground">
-            {t.subtitle}
+            {tx('subtitle')}
           </p>
         </div>
 
@@ -200,7 +260,7 @@ const Crops = () => {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
-              placeholder={t.search}
+              placeholder={tx('search')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -208,7 +268,7 @@ const Crops = () => {
           </div>
           <Button onClick={() => setAddOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
-            {t.addNewCrop}
+            {tx('addNewCrop')}
           </Button>
         </div>
 
@@ -223,9 +283,9 @@ const Crops = () => {
                       <Sprout className="h-6 w-6 text-primary-foreground" />
                     </div>
                     <div>
-                      <CardTitle className="text-xl">{crop.name}</CardTitle>
+                      <CardTitle className="text-xl">{tCropName(crop.name)}</CardTitle>
                       <Badge className={`mt-1 ${getSeasonColor(crop.season)}`}>
-                        {crop.season}
+                        {tSeason(crop.season)}
                       </Badge>
                     </div>
                   </div>
@@ -234,24 +294,24 @@ const Crops = () => {
               <CardContent className="space-y-3">
                 <div className="flex items-center gap-2 text-sm">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">{t.duration}:</span>
-                  <span className="font-medium">{crop.duration}</span>
+                  <span className="text-muted-foreground">{tx('duration')}:</span>
+                  <span className="font-medium">{tDuration(crop.duration)}</span>
                 </div>
                 
                 <div className="flex items-center gap-2 text-sm">
                   <Droplets className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">{t.water}:</span>
-                  <span className="font-medium">{crop.waterRequirement}</span>
+                  <span className="text-muted-foreground">{tx('water')}:</span>
+                  <span className="font-medium">{tWater(crop.waterRequirement)}</span>
                 </div>
 
                 <div className="flex items-start gap-2 text-sm">
                   <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
                   <div className="flex-1">
-                    <span className="text-muted-foreground">{t.mainRegions}:</span>
-                    <div className="flex flex-wrap gap-1 mt-1">
+                    <span className="text-muted-foreground">{tx('mainRegions')}:</span>
+                      <div className="flex flex-wrap gap-1 mt-1">
                       {crop.regions.map((region, idx) => (
                         <Badge key={idx} variant="secondary" className="text-xs">
-                          {region}
+                          {tRegion(region)}
                         </Badge>
                       ))}
                     </div>
@@ -259,8 +319,8 @@ const Crops = () => {
                 </div>
 
                 <div className="pt-2">
-                  <p className="text-sm text-muted-foreground">
-                    <span className="font-medium text-foreground">{t.soil}:</span> {crop.soilType}
+                    <p className="text-sm text-muted-foreground">
+                    <span className="font-medium text-foreground">{tx('soil')}:</span> {tSoil(crop.soilType)}
                   </p>
                 </div>
 
@@ -271,7 +331,7 @@ const Crops = () => {
                     setDetailOpen(true);
                   }}
                 >
-                  {t.viewDetails}
+                  {tx('viewDetails')}
                 </Button>
               </CardContent>
             </Card>

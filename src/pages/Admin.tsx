@@ -65,7 +65,7 @@ const Admin = () => {
     { label: t("admin.totalUsers"), value: "2,847", icon: Users, change: "+12%" },
     { label: t("admin.activeCrops"), value: "247", icon: Database, change: "+5%" },
     { label: t("admin.totalListings"), value: "156", icon: Database, change: "+8%" },
-    { label: t("admin.transactionsToday") ?? t("admin.transactionHistory"), value: String(transactionCount), icon: Database, change: "+0%" },
+    { label: t("admin.transactionsToday") ?? t("admin.transactionHistory"), value: String(transactionCount), icon: Database, change: "+4%" },
   ];
 
   return (

@@ -38,146 +38,52 @@ const Market = () => {
 
   const [selectedCrop, setSelectedCrop] = useState<string>(crops[0].key);
   const [compareMode, setCompareMode] = useState<boolean>(false);
-  // selectedCompare contains keys of crops user wants to compare (max 4)
   const [selectedCompare, setSelectedCompare] = useState<string[]>(crops.slice(0, 3).map((c) => c.key));
+  
   const colorForCrop = (key: string) => {
     switch (key) {
-      case "wheat":
-        return "hsl(var(--primary))";
-      case "rice":
-        return "hsl(var(--secondary))";
-      case "cotton":
-        return "hsl(var(--accent))";
-      case "soybean":
-        return "hsl(var(--muted-foreground))";
-      case "sugarcane":
-        return "hsl(48 95% 50%)"; // warm yellow-green
-      case "onion":
-        return "hsl(10 80% 50%)"; // red-orange
-      case "maize":
-        return "hsl(42 90% 48%)"; // maize yellow
-      case "potato":
-        return "hsl(30 20% 40%)"; // earthy brown
-      case "groundnut":
-        return "hsl(34 85% 48%)"; // peanut
-      case "sunflower":
-        return "hsl(45 95% 50%)"; // bright sunflower
-      case "mustard":
-        return "hsl(48 90% 40%)"; // mustard yellow
-      case "bajra":
-        return "hsl(25 30% 45%)"; // light brown
-      case "chilli":
-        return "hsl(5 85% 45%)"; // deep red
-      default:
-        return "hsl(var(--primary))";
+      case "wheat": return "hsl(var(--primary))";
+      case "rice": return "hsl(var(--secondary))";
+      case "cotton": return "hsl(var(--accent))";
+      case "soybean": return "hsl(var(--muted-foreground))";
+      case "sugarcane": return "hsl(48 95% 50%)";
+      case "onion": return "hsl(10 80% 50%)";
+      case "maize": return "hsl(42 90% 48%)";
+      case "potato": return "hsl(30 20% 40%)";
+      case "groundnut": return "hsl(34 85% 48%)";
+      case "sunflower": return "hsl(45 95% 50%)";
+      case "mustard": return "hsl(48 90% 40%)";
+      case "bajra": return "hsl(25 30% 45%)";
+      case "chilli": return "hsl(5 85% 45%)";
+      default: return "hsl(var(--primary))";
     }
   };
 
+  const translateCropName = (cropKey: string): string => {
+    const key = cropKey.toLowerCase();
+    return t.cropLabels?.[key as keyof typeof t.cropLabels] ?? cropKey;
+  };
+
+  const translateMarketName = (marketName: string): string => {
+    const districtName = marketName.replace(/\s+APMC$/i, '').trim().toLowerCase();
+    const translatedDistrict = t.districts?.[districtName as keyof typeof t.districts] ?? districtName;
+    return `${translatedDistrict} ${t.apmc || 'APMC'}`;
+  };
+
   const marketData = [
-    { 
-      crop: "Wheat", 
-      currentPrice: 2450, 
-      previousPrice: 2350, 
-      change: 4.3,
-      volume: "1250 quintals",
-      market: "Nashik APMC"
-    },
-    { 
-      crop: "Rice", 
-      currentPrice: 3100, 
-      previousPrice: 3150, 
-      change: -1.6,
-      volume: "980 quintals",
-      market: "Pune APMC"
-    },
-    { 
-      crop: "Cotton", 
-      currentPrice: 5800, 
-      previousPrice: 5500, 
-      change: 5.5,
-      volume: "2100 quintals",
-      market: "Jalgaon APMC"
-    },
-    { 
-      crop: "Soybean", 
-      currentPrice: 4000, 
-      previousPrice: 4150, 
-      change: -3.6,
-      volume: "1680 quintals",
-      market: "Latur APMC"
-    },
-    { 
-      crop: "Sugarcane", 
-      currentPrice: 3200, 
-      previousPrice: 3150, 
-      change: 1.6,
-      volume: "3200 quintals",
-      market: "Kolhapur APMC"
-    },
-    { 
-      crop: "Onion", 
-      currentPrice: 2800, 
-      previousPrice: 2650, 
-      change: 5.7,
-      volume: "890 quintals",
-      market: "Nashik APMC"
-    },
-    {
-      crop: "Maize",
-      currentPrice: 2250,
-      previousPrice: 2180,
-      change: 3.2,
-      volume: "1400 quintals",
-      market: "Nagpur APMC"
-    },
-    {
-      crop: "Potato",
-      currentPrice: 1900,
-      previousPrice: 1850,
-      change: 2.7,
-      volume: "2600 quintals",
-      market: "Pune APMC"
-    },
-    {
-      crop: "Groundnut",
-      currentPrice: 3600,
-      previousPrice: 3520,
-      change: 2.3,
-      volume: "920 quintals",
-      market: "Solapur APMC"
-    },
-    {
-      crop: "Sunflower",
-      currentPrice: 3850,
-      previousPrice: 3725,
-      change: 3.5,
-      volume: "540 quintals",
-      market: "Akola APMC"
-    },
-    {
-      crop: "Mustard",
-      currentPrice: 2950,
-      previousPrice: 2875,
-      change: 2.6,
-      volume: "600 quintals",
-      market: "Amravati APMC"
-    },
-    {
-      crop: "Bajra",
-      currentPrice: 1580,
-      previousPrice: 1540,
-      change: 2.6,
-      volume: "720 quintals",
-      market: "Nanded APMC"
-    },
-    {
-      crop: "Chilli",
-      currentPrice: 4450,
-      previousPrice: 4400,
-      change: 1.1,
-      volume: "310 quintals",
-      market: "Jalna APMC"
-    },
+    { cropKey: "wheat", crop: translateCropName("wheat"), currentPrice: 2450, previousPrice: 2350, change: 4.3, volume: "1250", market: translateMarketName("Nashik APMC") },
+    { cropKey: "rice", crop: translateCropName("rice"), currentPrice: 3100, previousPrice: 3150, change: -1.6, volume: "980", market: translateMarketName("Pune APMC") },
+    { cropKey: "cotton", crop: translateCropName("cotton"), currentPrice: 5800, previousPrice: 5500, change: 5.5, volume: "2100", market: translateMarketName("Jalgaon APMC") },
+    { cropKey: "soybean", crop: translateCropName("soybean"), currentPrice: 4000, previousPrice: 4150, change: -3.6, volume: "1680", market: translateMarketName("Latur APMC") },
+    { cropKey: "sugarcane", crop: translateCropName("sugarcane"), currentPrice: 3200, previousPrice: 3150, change: 1.6, volume: "3200", market: translateMarketName("Kolhapur APMC") },
+    { cropKey: "onion", crop: translateCropName("onion"), currentPrice: 2800, previousPrice: 2650, change: 5.7, volume: "890", market: translateMarketName("Nashik APMC") },
+    { cropKey: "maize", crop: translateCropName("maize"), currentPrice: 2250, previousPrice: 2180, change: 3.2, volume: "1400", market: translateMarketName("Nagpur APMC") },
+    { cropKey: "potato", crop: translateCropName("potato"), currentPrice: 1900, previousPrice: 1850, change: 2.7, volume: "2600", market: translateMarketName("Pune APMC") },
+    { cropKey: "groundnut", crop: translateCropName("groundnut"), currentPrice: 3600, previousPrice: 3520, change: 2.3, volume: "920", market: translateMarketName("Solapur APMC") },
+    { cropKey: "sunflower", crop: translateCropName("sunflower"), currentPrice: 3850, previousPrice: 3725, change: 3.5, volume: "540", market: translateMarketName("Akola APMC") },
+    { cropKey: "mustard", crop: translateCropName("mustard"), currentPrice: 2950, previousPrice: 2875, change: 2.6, volume: "600", market: translateMarketName("Amravati APMC") },
+    { cropKey: "bajra", crop: translateCropName("bajra"), currentPrice: 1580, previousPrice: 1540, change: 2.6, volume: "720", market: translateMarketName("Nanded APMC") },
+    { cropKey: "chilli", crop: translateCropName("chilli"), currentPrice: 4450, previousPrice: 4400, change: 1.1, volume: "310", market: translateMarketName("Jalna APMC") },
   ];
 
   return (
@@ -211,7 +117,6 @@ const Market = () => {
               <button
                 type="button"
                 onClick={() => {
-                  // ensure at least 2 selected when entering compare mode
                   setCompareMode((s) => {
                     const next = !s;
                     if (next && selectedCompare.length < 2) {
@@ -225,7 +130,6 @@ const Market = () => {
               </button>
             </div>
           </CardHeader>
-          {/* When in compare mode show crop chips to pick which crops to compare (2-4) */}
           {compareMode && (
             <div className="px-4 pb-2">
               <div className="flex flex-wrap gap-2">
@@ -238,7 +142,7 @@ const Market = () => {
                       onClick={() => {
                         setSelectedCompare((prev) => {
                           if (prev.includes(c.key)) return prev.filter((k) => k !== c.key);
-                          if (prev.length >= 4) return prev; // limit to 4
+                          if (prev.length >= 4) return prev;
                           return [...prev, c.key];
                         });
                       }}
@@ -334,6 +238,12 @@ const Market = () => {
           </CardContent>
         </Card>
 
+        {/* NEW: Current Mandi Prices Header */}
+        <div className="space-y-2">
+          <h2 className="text-2xl font-bold text-foreground">{t.currentPrices}</h2>
+          <p className="text-muted-foreground">{t.currentPricesSubtitle}</p>
+        </div>
+
         {/* Current Prices */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {marketData.map((m) => (
@@ -355,8 +265,12 @@ const Market = () => {
                   </div>
                   <p className="text-sm text-muted-foreground">{language === 'en' ? 'Previous' : language === 'hi' ? 'पिछला' : 'मागील'}: ₹{m.previousPrice}</p>
                   <div className="pt-3 border-t space-y-1">
-                    <p className="text-sm text-muted-foreground"><span className="font-medium text-foreground">{language === 'en' ? 'Volume' : language === 'hi' ? 'मात्रा' : 'प्रमाण'}:</span> {m.volume}</p>
-                    <p className="text-sm text-muted-foreground"><span className="font-medium text-foreground">{language === 'en' ? 'Market' : language === 'hi' ? 'बाजार' : 'बाजार'}:</span> {m.market}</p>
+                    <p className="text-sm text-muted-foreground">
+                      <span className="font-medium text-foreground">{t.volume}:</span> {m.volume} {t.quintals}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      <span className="font-medium text-foreground">{t.marketLabel}:</span> {m.market}
+                    </p>
                   </div>
                 </div>
               </CardContent>

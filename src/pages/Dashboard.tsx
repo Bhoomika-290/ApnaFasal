@@ -23,9 +23,9 @@ const Dashboard = () => {
   ];
 
   const alerts = [
-    { id: 1, type: "weather", message: "Heavy rainfall expected in Nashik district", severity: "high" },
-    { id: 2, type: "price", message: "Cotton prices up 8.5% - Good selling opportunity", severity: "medium" },
-    { id: 3, type: "advisory", message: "Pest alert: Whitefly detected in Jalgaon", severity: "high" },
+    { id: 1, type: "weather", messageKey: "dashboard.alertMessages.rainNashik", severity: "high" },
+    { id: 2, type: "price", messageKey: "dashboard.alertMessages.cottonOpportunity", severity: "medium" },
+    { id: 3, type: "advisory", messageKey: "dashboard.alertMessages.whiteflyJalgaon", severity: "high" },
   ];
 
   const { t } = useTranslation();
@@ -167,9 +167,9 @@ const Dashboard = () => {
         {/* Alerts & Advisories */}
         <Card className="shadow-soft">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-accent" />
-              {t("dashboard.activeAlerts")}
+              {t("dashboard.alerts")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -189,7 +189,7 @@ const Dashboard = () => {
                         alert.severity === "high" ? "text-destructive" : "text-accent"
                       }`} 
                     />
-                    <p className="text-sm text-foreground flex-1">{alert.message}</p>
+                    <p className="text-sm text-foreground flex-1">{t(alert.messageKey)}</p>
                   </div>
                 </div>
               ))}

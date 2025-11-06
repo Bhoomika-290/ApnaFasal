@@ -6,71 +6,95 @@ import { Lightbulb, TrendingUp, AlertCircle, Calendar, MapPin } from "lucide-rea
 import { RecommendationDetailDialog } from "@/components/RecommendationDetailDialog";
 import { useTranslation } from "@/hooks/useTranslation";
 
+// Define the crop data type
+interface CropData {
+  name: string;
+  reason: string;
+  soilSuitability: string;
+  marketTrend: string;
+}
 
 const Recommendations = () => {
   const { t } = useTranslation();
   const tr = (k: string) => t(`recommendations.${k}`);
   const [selectedRec, setSelectedRec] = useState<any>(null);
   const [detailOpen, setDetailOpen] = useState(false);
+
+  // Get crop data from translations with proper typing
+  const getCropData = (cropKey: string): CropData => {
+    const cropData = t(`recommendations.crops.${cropKey}`) as any;
+    return cropData || {
+      name: cropKey,
+      reason: "",
+      soilSuitability: "",
+      marketTrend: ""
+    };
+  };
+
   const recommendations = [
     {
       rank: 1,
-      crop: "Cotton",
+      cropKey: "cotton",
+      crop: getCropData("cotton").name || "Cotton",
       score: 8.7,
       expectedProfit: "₹85,000 per hectare",
       risk: "Medium",
-      soilSuitability: "Excellent",
-      marketTrend: "Strong upward",
+      soilSuitability: getCropData("cotton").soilSuitability || "Excellent",
+      marketTrend: getCropData("cotton").marketTrend || "Strong upward",
       sowingWindow: "June - July 2024",
-      reason: "Black soil perfect for cotton. Prices up 8.5% with strong demand from textile mills.",
+      reason: getCropData("cotton").reason || "Black soil perfect for cotton. Prices up 8.5% with strong demand from textile mills.",
       districts: ["Jalgaon", "Akola", "Yavatmal"]
     },
     {
       rank: 2,
-      crop: "Soybean",
+      cropKey: "soybean",
+      crop: getCropData("soybean").name || "Soybean",
       score: 8.4,
       expectedProfit: "₹65,000 per hectare",
       risk: "Low",
-      soilSuitability: "Very Good",
-      marketTrend: "Stable",
+      soilSuitability: getCropData("soybean").soilSuitability || "Very Good",
+      marketTrend: getCropData("soybean").marketTrend || "Stable",
       sowingWindow: "June - July 2024",
-      reason: "Low water requirement suits current forecast. Stable export demand ensures good returns.",
+      reason: getCropData("soybean").reason || "Low water requirement suits current forecast. Stable export demand ensures good returns.",
       districts: ["Latur", "Beed", "Nanded"]
     },
     {
       rank: 3,
-      crop: "Onion (Kharif)",
+      cropKey: "onion",
+      crop: getCropData("onion").name || "Onion (Kharif)",
       score: 8.1,
       expectedProfit: "₹75,000 per hectare",
       risk: "High",
-      soilSuitability: "Good",
-      marketTrend: "Volatile but positive",
+      soilSuitability: getCropData("onion").soilSuitability || "Good",
+      marketTrend: getCropData("onion").marketTrend || "Volatile but positive",
       sowingWindow: "June - July 2024",
-      reason: "High-risk, high-reward. Recent price spike of 5.7% indicates strong demand.",
+      reason: getCropData("onion").reason || "High-risk, high-reward. Recent price spike of 5.7% indicates strong demand.",
       districts: ["Nashik", "Pune", "Ahmednagar"]
     },
     {
       rank: 4,
-      crop: "Maize",
+      cropKey: "maize",
+      crop: getCropData("maize").name || "Maize",
       score: 7.8,
       expectedProfit: "₹58,000 per hectare",
       risk: "Low",
-      soilSuitability: "Good",
-      marketTrend: "Steady",
+      soilSuitability: getCropData("maize").soilSuitability || "Good",
+      marketTrend: getCropData("maize").marketTrend || "Steady",
       sowingWindow: "June - July 2024",
-      reason: "Safe choice with consistent demand. Good for risk-averse farmers.",
+      reason: getCropData("maize").reason || "Safe choice with consistent demand. Good for risk-averse farmers.",
       districts: ["Ahmednagar", "Pune", "Satara"]
     },
     {
       rank: 5,
-      crop: "Groundnut",
+      cropKey: "groundnut",
+      crop: getCropData("groundnut").name || "Groundnut",
       score: 7.5,
       expectedProfit: "₹62,000 per hectare",
       risk: "Medium",
-      soilSuitability: "Very Good",
-      marketTrend: "Moderate positive",
+      soilSuitability: getCropData("groundnut").soilSuitability || "Very Good",
+      marketTrend: getCropData("groundnut").marketTrend || "Moderate positive",
       sowingWindow: "June - July 2024",
-      reason: "Good soil match. Oil mills offering premium for quality produce.",
+      reason: getCropData("groundnut").reason || "Good soil match. Oil mills offering premium for quality produce.",
       districts: ["Solapur", "Osmanabad", "Sangli"]
     },
   ];
@@ -179,13 +203,13 @@ const Recommendations = () => {
                 </div>
 
                 {/* Reason */}
-                  <div className="flex items-start gap-3 p-4 rounded-lg bg-primary/5 border border-primary/20">
-                    <AlertCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    <div className="flex flex-col">
-                      <p className="text-sm text-muted-foreground mb-1">{tr("reason")}</p>
-                      <p className="text-sm text-foreground">{rec.reason}</p>
-                    </div>
+                <div className="flex items-start gap-3 p-4 rounded-lg bg-primary/5 border border-primary/20">
+                  <AlertCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                  <div className="flex flex-col">
+                    <p className="text-sm text-muted-foreground mb-1">{tr("reason")}</p>
+                    <p className="text-sm text-foreground">{rec.reason}</p>
                   </div>
+                </div>
 
                 {/* Districts */}
                 <div>

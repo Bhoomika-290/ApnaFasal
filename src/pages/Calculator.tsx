@@ -13,8 +13,32 @@ import { Switch } from "@/components/ui/switch";
 
 const Calculator = () => {
   const { language } = useLanguage();
-  const t = translations[language].calculator;
-
+  const t = translations[language].calculator as {
+  title: string;
+  subtitle: string;
+  inputDetails: string;
+  area: string;
+  selectCrop: string;
+  region?: string;
+  costBreakdown?: string;
+  seedCost: string;
+  fertilizerCost: string;
+  laborCost: string;
+  otherCosts: string;
+  costUnitLabel: string;
+  perHectare: string;
+  totalForArea: string;
+  calculate: string;
+  results: string;
+  totalCost: string;
+  estimatedYield: string;
+  expectedRevenue: string;
+  profit: string;
+  profitMargin: string;
+  breakEven: string;
+  fillAllFields: string;
+  success: string;
+};
   const [area, setArea] = useState("");
   const [selectedCrop, setSelectedCrop] = useState("");
   const [seedCost, setSeedCost] = useState("");

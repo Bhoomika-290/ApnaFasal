@@ -26,7 +26,25 @@ interface Listing {
 
 const Marketplace = () => {
   const { language } = useLanguage();
-  const t = translations[language].marketplace;
+  const t = translations[language].marketplace as {
+  title: string;
+  subtitle: string;
+  search: string;
+  allListings: string;
+  buyRequests: string;
+  sellOffers: string;
+  postListing: string;
+  history?: string;
+  buy: string;
+  sell: string;
+  perQuintal: string;
+  quantity: string;
+  quintals: string;
+  makeOffer: string;
+  contactSeller: string;
+  noListings: string;
+};
+
   const [filterType, setFilterType] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [actionDialog, setActionDialog] = useState<{
